@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>HTML 블록 코딩</title>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
     body { display: flex; height: 100vh; margin: 0; font-family: Arial, sans-serif; }
     .panel { flex: 1; padding: 10px; box-sizing: border-box; border-right: 1px solid #ccc; overflow: auto; }
@@ -11,8 +10,7 @@
     h2 { margin-top: 0; }
     button { display: block; margin: 5px 0; padding: 8px; background: #ff7f50; color: white; border: none; border-radius: 5px; cursor: pointer; }
     textarea { width: 100%; height: 85%; font-family: monospace; font-size: 14px; }
-    iframe { width: 100%; height: 70%; border: 1px solid #ccc; background: white; }
-    #screenshot { margin-top: 10px; max-width: 100%; border: 1px solid #ccc; }
+    iframe { width: 100%; height: 85%; border: 1px solid #ccc; background: white; }
   </style>
 </head>
 <body>
@@ -42,15 +40,12 @@
 </html>
     </textarea>
     <button onclick="runCode()">▶ 실행</button>
-    <button onclick="capture()">📸 캡처</button>
   </div>
 
   <!-- 3번: 미리보기 -->
   <div class="panel">
     <h2>결과</h2>
     <iframe id="preview"></iframe>
-    <h3>정적 스크린샷</h3>
-    <img id="screenshot" alt="캡처된 이미지가 여기에 표시됩니다.">
   </div>
 
 <script>
@@ -68,7 +63,6 @@ main { padding: 20px; }`,
     let textarea = document.getElementById("codeArea");
     let code = textarea.value;
 
-    // 스타일은 <style> 태그 안에, 나머지는 body/head에 자동 삽입
     if (type.startsWith("style")) {
       if (!code.includes("<style>")) {
         code = code.replace("</head>", "  <style>\n  </style>\n</head>");
@@ -89,16 +83,6 @@ main { padding: 20px; }`,
     let code = document.getElementById("codeArea").value;
     let iframe = document.getElementById("preview");
     iframe.srcdoc = code;
-  }
-
-  function capture() {
-    let iframe = document.getElementById("preview");
-    let iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-
-    html2canvas(iframeDoc.body).then(canvas => {
-      let img = document.getElementById("screenshot");
-      img.src = canvas.toDataURL("image/png");
-    });
   }
 </script>
 
