@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>HTML 블록 코딩 - 시각 예제</title>
+  <title>HTML 블록 코딩 - 학생용</title>
   <style>
     body { display: flex; height: 100vh; margin: 0; font-family: Arial, sans-serif; }
     .panel { flex: 1; padding: 10px; box-sizing: border-box; border-right: 1px solid #ccc; overflow: auto; }
@@ -14,6 +14,9 @@
     header { background-color: #ffdab9; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 10px; }
     main { padding: 20px; }
     .box { background-color: #ffe4e1; padding: 15px; margin: 10px 0; border-radius: 10px; }
+    img { width: 150px; border-radius: 50%; }
+    input[type="text"] { padding: 8px; width: 80%; margin-right: 10px; }
+    ul { list-style: none; padding-left: 0; }
   </style>
 </head>
 <body>
@@ -21,7 +24,7 @@
   <!-- 1번: 블록 버튼 영역 -->
   <div class="panel">
     <h2>블록 선택</h2>
-    <button onclick="addBlock('title')">제목</button>
+    <button onclick="addBlock('pageTitle')">페이지 제목</button>
     <button onclick="addBlock('subtitle1')">소제목 1</button>
     <button onclick="addBlock('subtitle2')">소제목 2</button>
     <button onclick="addBlock('paragraph1')">본문 1</button>
@@ -55,13 +58,12 @@
   </div>
 
 <script>
-  // 블록별 코드 정의
   const blocks = {
-    title: `<title>나의 자기소개 페이지</title>`,
-    subtitle1: `<h2>나의 소개</h2>`,
-    subtitle2: `<h2>취미와 관심사</h2>`,
-    paragraph1: `<p>안녕하세요! 저는 중학생 디지털 튜터 수업용 페이지를 만들어보고 있어요.</p>`,
-    paragraph2: `<p>취미는 코딩과 그림 그리기이며, 미래에는 웹 개발자가 되고 싶습니다.</p>`,
+    pageTitle: { title: "나의 자기소개 페이지", h1: "나의 자기소개 페이지" },
+    subtitle1: `<h2>소개</h2>`,
+    subtitle2: `<h2>취미</h2>`,
+    paragraph1: `<p>안녕하세요! 저는 중학생 웹 개발자를 꿈꾸고 있습니다.</p>`,
+    paragraph2: `<p>코딩, 게임, 그림 그리기를 좋아합니다.</p>`,
     styleHeader: `header { background-color: #ffdab9; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 10px; }
 main { padding: 20px; }`,
     styleBody: `body { font-family: Arial, sans-serif; background-color: #faf0e6; }`,
@@ -77,36 +79,44 @@ main { padding: 20px; }`,
 </body>
 </html>`;
 
-  // 블록 클릭 시 코드 삽입
   function addBlock(type) {
     let textarea = document.getElementById("codeArea");
     let code = textarea.value;
 
-    if (type.startsWith("style")) {
+    if(type === "pageTitle") {
+      // <title>과 <h1> 추가
+      if(!code.includes("<title>")) {
+        code = code.replace("<meta charset=\"UTF-8\">", `<meta charset="UTF-8">\n  <title>${blocks.pageTitle.title}</title>`);
+      } else {
+        code = code.replace(/<title>.*<\/title>/, `<title>${blocks.pageTitle.title}</title>`);
+      }
+
+      if(!code.includes("<header>")) {
+        code = code.replace("</body>", `<header><h1>${blocks.pageTitle.h1}</h1></header>\n</body>`);
+      } else {
+        code = code.replace(/<header>.*<\/header>/s, `<header><h1>${blocks.pageTitle.h1}</h1></header>`);
+      }
+    } 
+    else if (type.startsWith("style")) {
       if (!code.includes("<style>")) {
         code = code.replace("</head>", "  <style>\n  </style>\n</head>");
       }
       code = code.replace("</style>", "  " + blocks[type] + "\n</style>");
-    } else if (type === "title") {
-      if (!code.includes("<title>")) {
-        code = code.replace("<meta charset=\"UTF-8\">", `<meta charset="UTF-8">\n  ${blocks[type]}`);
-      }
-    } else {
-      // 소제목/본문 등은 body 닫히기 전에 추가
+    } 
+    else {
+      // 소제목/본문 등은 body 닫기 전에 추가
       code = code.replace("</body>", "  " + blocks[type] + "\n</body>");
     }
 
     textarea.value = code;
   }
 
-  // 실행 버튼
   function runCode() {
     let code = document.getElementById("codeArea").value;
     let iframe = document.getElementById("preview");
     iframe.srcdoc = code;
   }
 
-  // 초기화 버튼
   function resetCode() {
     document.getElementById("codeArea").value = defaultCode;
     document.getElementById("preview").srcdoc = defaultCode;
