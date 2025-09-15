@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML 블록 코딩</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body { display: flex; height: 100vh; margin: 0; font-family: Arial, sans-serif; }
+    .panel { flex: 1; padding: 10px; box-sizing: border-box; border-right: 1px solid #ccc; overflow: auto; }
+    .panel:last-child { border-right: none; }
+    h2 { margin-top: 0; }
+    button { display: block; margin: 5px 0; padding: 8px; background: #ff7f50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    textarea { width: 100%; height: 85%; font-family: monospace; font-size: 14px; }
+    iframe { width: 100%; height: 70%; border: 1px solid #ccc; background: white; }
+    #screenshot { margin-top: 10px; max-width: 100%; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+  <!-- 1번: 블록 버튼 영역 -->
+  <div class="panel">
+    <h2>블록 선택</h2>
+    <button onclick="addBlock('title')">제목</button>
+    <button onclick="addBlock('subtitle')">소제목</button>
+    <button onclick="addBlock('paragraph')">본문</button>
+    <button onclick="addBlock('styleHeader')">스타일-헤더</button>
+    <button onclick="addBlock('styleBody')">스타일-본문</button>
+    <button onclick="addBlock('styleBox')">스타일-박스</button>
+  </div>
+
+  <!-- 2번: 코드 영역 -->
+  <div class="panel">
+    <h2>코드</h2>
+    <textarea id="codeArea">
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+</body>
+</html>
+    </textarea>
+    <button onclick="runCode()">▶ 실행</button>
+    <button onclick="capture()">📸 캡처</button>
+  </div>
+
+  <!-- 3번: 미리보기 -->
+  <div class="panel">
+    <h2>결과</h2>
+    <iframe id="preview"></iframe>
+    <h3>정적 스크린샷</h3>
+    <img id="screenshot" alt="캡처된 이미지가 여기에 표시됩니다.">
+  </div>
+
+<script>
+  const blocks = {
+    title: `<title>자기소개 페이지</title>`,
+    subtitle: `<h2>소제목 예시</h2>`,
+    paragraph: `<p>이것은 본문 내용입니다.</p>`,
+    styleHeader: `header { background-color: #ffdab9; padding: 20px; text-align: center; }
+main { padding: 20px; }`,
+    styleBody: `body { font-family: Arial, sans-serif; background-color: #faf0e6; }`,
+    styleBox: `.box { background-color: #ffe4e1; padding: 15px; margin: 10px 0; border-radius: 10px; }`
+  };
+
+  function addBlock(type) {
+    let textarea = document.getElementById("codeArea");
+    let code = textarea.value;
+
+    // 스타일은 <style> 태그 안에, 나머지는 body/head에 자동 삽입
+    if (type.startsWith("style")) {
+      if (!code.includes("<style>")) {
+        code = code.replace("</head>", "  <style>\n  </style>\n</head>");
+      }
+      code = code.replace("</style>", "  " + blocks[type] + "\n</style>");
+    } else if (type === "title") {
+      if (!code.includes("<title>")) {
+        code = code.replace("<meta charset=\"UTF-8\">", `<meta charset="UTF-8">\n  ${blocks[type]}`);
+      }
+    } else {
+      code = code.replace("</body>", "  " + blocks[type] + "\n</body>");
+    }
+
+    textarea.value = code;
+  }
+
+  function runCode() {
+    let code = document.getElementById("codeArea").value;
+    let iframe = document.getElementById("preview");
+    iframe.srcdoc = code;
+  }
+
+  function capture() {
+    let iframe = document.getElementById("preview");
+    let iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+    html2canvas(iframeDoc.body).then(canvas => {
+      let img = document.getElementById("screenshot");
+      img.src = canvas.toDataURL("image/png");
+    });
+  }
+</script>
+
+</body>
+</html>
